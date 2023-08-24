@@ -125,9 +125,9 @@
             const commands_box = $("#commands-box");
             commands_box.empty();
 
-            const non_ssl_template = 'curl -X PURGE -H "X-Acquia-Purge:[sitename]" --compressed -H "Host: [domain]" http://[bal].[realm].hosting.acquia.com[path]';
-            const ssl_template = 'curl -k -X PURGE -H "X-Acquia-Purge:[sitename]" --compressed -H "Host: [domain]" https://[bal].[realm].hosting.acquia.com[path]';
-            let cdn = 'curl -X PURGE -H "X-Acquia-Purge:[sitename]" -H "Accept-Encoding: gzip" -H "Host: [domain]" http://[eip_address][path]';
+            const non_ssl_template = 'curl -X PURGE -H "X-Acquia-Purge:[sitename]" --compressed -H "Host: [domain]" http://[bal].[realm].hosting.acquia.com[path];';
+            const ssl_template = 'curl -k -X PURGE -H "X-Acquia-Purge:[sitename]" --compressed -H "Host: [domain]" https://[bal].[realm].hosting.acquia.com[path]'';
+            let cdn = 'curl -X PURGE -H "X-Acquia-Purge:[sitename]" -H "Accept-Encoding: gzip" -H "Host: [domain]" http://[eip_address][path];';
 
             let template;
 
