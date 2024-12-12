@@ -7,189 +7,80 @@
   <!-- Include Clipboard.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
 
-  <!-- Inline CSS -->
-  <style>
-      body {
-          font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-          font-size: 14px;
-          line-height: 20px;
-          font-weight: 400;
-          color: #3b3b3b;
-          background-color: #fff;
-          padding: 20px;
-      }
-
-      #options div {
-          margin: 1em 0;
-      }
-
-      #options label {
-          display: block;
-          font-weight: bold;
-      }
-
-      #commands-box {
-          background: #eee;
-          padding: 1em;
-      }
-  </style>
+  <!-- Include our stylesheet -->
+  <link rel="stylesheet" type="text/css" href="index.css">
 </head>
 <body>
-<h1>Acquia Cache Busting Commands</h1>
+  <h1>Acquia Cache Busting Commands</h1>
+  <p>You must fill in the required form fields before the commands will be displayed.</p>
 
-<div id="options">
-  <h2>Options</h2>
-  <div>
-    <label htmlFor="realm">Realm</label>
-    <select id="realm" name="realm" value="prod">
-      <option name="prod" value="prod">Cloud Platform Enterprise (prod)</option>
-      <option name="devcloud" value="devcloud">Cloud Platform Professional (devcloud)</option>
-    </select>
+  <div id="options">
+    <h2>Options</h2>
+    <div>
+      <label htmlFor="realm">Realm*</label>
+      <select id="realm" name="realm" value="prod">
+        <option name="prod" value="prod">Cloud Platform Enterprise (prod)</option>
+        <option name="devcloud" value="devcloud">Cloud Platform Professional (devcloud)</option>
+      </select>
+    </div>
+
+    <div>
+      <label htmlFor="ssl">SSL / HTTPS enabled?*</label>
+      <input type="checkbox" id="ssl" name="ssl" value="ssl" checked/>
+    </div>
+
+    <div>
+      <label htmlFor="cdn">CDN in use?*</label>
+      <input type="checkbox" id="cdn" name="cdn" value="cdn" checked/>
+    </div>
+
+    <div>
+      <label htmlFor="eip">Elastic IP address*</label>
+      <input type="text" id="eip" name="eip" placeholder="1.2.3.4"/>
+    </div>
+
+    <div>
+      <label for="sitename">Sitename*</label>
+      <input type="text" id="sitename" name="sitename" placeholder="acquiamachinename.prod"/>
+    </div>
+
+    <div>
+      <label for="bal-1">Balancer #1 ID*</label>
+      <input type="text" id="bal-1" name="bal-1" placeholder="bal-1234"/>
+    </div>
+
+    <div>
+      <label for="bal-2">Balancer #2 ID</label>
+      <input type="text" id="bal-2" name="bal-2" placeholder="bal-1235"/>
+    </div>
+
+    <div>
+      <label for="domain">Domain*</label>
+      <input type="text" id="domain" name="domain" placeholder="www.site-example.com"/>
+    </div>
+
+    <div>
+      <label for="path">Path</label>
+      <input type="text" id="path" name="path" placeholder="/folder/image.jpg"/>
+    </div>
+
+    <div>
+      <p>Created by <a href="https://patrickfweston.com">Patrick Weston</a> while at <a href="https://palantir.net">Palantir.net</a>.</p>
+    </div>
   </div>
 
-  <div>
-    <label htmlFor="ssl">SSL / HTTPS enabled?</label>
-    <input type="checkbox" id="ssl" name="ssl" value="ssl" checked/>
+  <div id="commands" style="display: none;">
+    <h2>Commands</h2>
+    <pre id="commands-box">test</pre>
   </div>
 
-  <div>
-    <label htmlFor="cdn">CDN in use?</label>
-    <input type="checkbox" id="cdn" name="cdn" value="cdn" checked/>
+  <div id="copy-box" style="display: none;">
+    <button id="copy">Copy to Clipboard</button>
+    <span id="copy-message"></span>
   </div>
 
-  <div>
-    <label htmlFor="eip">Elastic IP address</label>
-    <input type="text" id="eip" name="eip" placeholder="1.2.3.4"/>
-  </div>
-
-  <div>
-    <label htmlFor="sitename">Sitename</label>
-    <input type="text" id="sitename" name="sitename" placeholder="acquiamachinename.prod"/>
-  </div>
-
-  <div>
-    <label htmlFor="bal-1">Balancer #1 ID</label>
-    <input type="text" id="bal-1" name="bal-1" placeholder="bal-1234"/>
-  </div>
-
-  <div>
-    <label htmlFor="bal-2">Balancer #2 ID</label>
-    <input type="text" id="bal-2" name="bal-2" placeholder="bal-1235"/>
-  </div>
-
-  <div>
-    <label htmlFor="domain">Domain</label>
-    <input type="text" id="domain" name="domain" placeholder="www.site-example.com"/>
-  </div>
-
-  <div>
-    <label htmlFor="path">Path</label>
-    <input type="text" id="path" name="path" placeholder="/folder/image.jpg"/>
-  </div>
-</div>
-
-<div id="commands" style="display: none;">
-  <h2>Commands</h2>
-  <pre id="commands-box">test</pre>
-</div>
-
-<div id="copy-box" style="display: none;">
-  <button id="copy">Copy to Clipboard</button>
-  <span id="copy-message"></span>
-</div>
-
-<script type="text/javascript">
-    // Toggle the Elastic IP address depending on whether CDN is enabled.
-    $("#cdn").on('click', function () {
-        if ($(this).is(':checked')) {
-            $("#eip").parent('div').show();
-        } else {
-            $("#eip").parent('div').hide();
-        }
-    });
-
-    $("#copy").on('click', function () {
-        const commands_box = $("#commands-box");
-        // Copy the commands to the clipboard.
-        const clipboard = new ClipboardJS('#copy', {
-            text: function () {
-                return commands_box.text();
-            }
-        });
-        $("#copy-message").text("Copied to clipboard!");
-    });
-
-    $("#options").on('change', function () {
-        if (allFilledIn()) {
-            // Clear the commands box.
-            const commands_box = $("#commands-box");
-            commands_box.empty();
-
-            const non_ssl_template = 'curl -X PURGE -H "X-Acquia-Purge:[sitename]" --compressed -H "Host: [domain]" "http://[bal].[realm].hosting.acquia.com[path]";';
-            const ssl_template = 'curl -k -X PURGE -H "X-Acquia-Purge:[sitename]" --compressed -H "Host: [domain]" "https://[bal].[realm].hosting.acquia.com[path]";';
-            let cdn = 'curl -X PURGE -H "X-Acquia-Purge:[sitename]" -H "Accept-Encoding: gzip" -H "Host: [domain]" "http://[eip_address][path]";';
-
-            let template;
-
-            if ($("#ssl").is(':checked')) {
-                template = ssl_template;
-            } else {
-                template = non_ssl_template;
-            }
-
-            // Process the template and replace values.
-            template = template.replace('[sitename]', $("#sitename").val());
-            template = template.replace('[domain]', $("#domain").val());
-            template = template.replace('[bal]', $("#bal-1").val());
-            template = template.replace('[realm]', $("#realm").val());
-            template = template.replace('[path]', $("#path").val());
-
-            // Add to the commands box.
-            commands_box.append(template);
-
-            // Add the second balancer if it's filled in.
-            const bal_2 = $("#bal-2");
-            if (bal_2.val() !== '') {
-                template = template.replace($("#bal-1").val(), bal_2.val());
-                commands_box.append('\n\n' + template);
-            }
-
-            // Lastly, add the CDN command if it's enabled.
-            if ($("#cdn").is(':checked')) {
-                cdn = cdn.replace('[sitename]', $("#sitename").val());
-                cdn = cdn.replace('[domain]', $("#domain").val());
-                cdn = cdn.replace('[eip_address]', $("#eip").val());
-                cdn = cdn.replace('[path]', $("#path").val());
-
-                commands_box.append('\n\n' + cdn);
-            }
-
-            $("#copy-box, #commands").show();
-        } else {
-            $("#copy-box, #commands").hide();
-        }
-    });
-
-    function allFilledIn() {
-        const elements = [
-            '#realm',
-            '#domain',
-            '#bal-1',
-            '#sitename'
-        ];
-
-        // Loop over each form element
-        for (let i = 0; i < elements.length; i++) {
-            // If the element is empty
-            if ($(elements[i]).val() === '') {
-                // Return false
-                return false;
-            }
-        }
-
-        return true;
-    }
-</script>
+  <!-- Include our custom JavaScript -->
+  <script src="index.js"></script>
 
 </body>
 
